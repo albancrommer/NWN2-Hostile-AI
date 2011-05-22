@@ -63,6 +63,7 @@ const float XP_FOR_FLEE_MODIFIER = 			0.5; // defines how much xp gets distribut
 const int MAX_FLEE_ROUNDS = 				10; // defines the numbers of round to wait before despawning escaping creatures
 const int MAX_FLEE_ROUNDS_WILDLIFE = 		20; // same as upper, but for wildlife
 const float DISTANCE_DISAPPEAR_FLEEING = 	30.0; // above this distance from next pc, escaping creatures aren't despawned
+const int S_MAX_LOC_SEARCH_DEPTH = 				10; // defines the depth of search when fleeing
 
 
 // Some more parameters
@@ -471,6 +472,56 @@ location GetFleeLocation( object oCreature, object oTarget, float fDist, float f
 	return locFlee;
 }
 
+
+/**
+ * Used by GetFleeLocation
+ **/ 
+location _getFleeLocation( object oCreature, object oTarget, float fDist, float fOptionalAngle = 0.0 ) {
+
+//	float fAngle 			= GetAngleBetweenObjects( oTarget , oCreature ) + fOptionalAngle;
+	float fAngle 			= GetAngleBetweenObjects( oTarget , oCreature ) + Random( 45 ) + fOptionalAngle;
+	//
+	vector vRef 			= GetPosition( oCreature );
+	//
+	vector vPosition 		=   VAtAngleToV( vRef, fDist, fAngle); 
+	//
+	location lFlee 			= Location( GetArea( oCreature ), vPosition, fAngle );
+	//
+DebugLocation( lFlee, "blue" );
+	return lFlee;
+	
+}
+
+/**
+ * Returns a valid location  
+ * (caution: this is ported from Planner AI, name there is GetValidFleeLocation 
+ *  with different parameters )
+ */ 
+location GetFleeLocation( object oCreature, object oTarget, float fDist, float fOptionalAngle = 0.0  ) {
+
+	//
+	int nSearchDepth;
+	//
+	float fDepthParam;
+	//
+	float fOptAngle = -30.0;
+	//
+	location lFlee 	;
+	
+	while( ! GetIsLocationValid( lFlee ) && nSearchDepth < S_MAX_LOC_SEARCH_DEPTH ) {
+
+		nSearchDepth++;
+		//
+		fDepthParam 	-= 3.0;
+		//
+		fOptAngle 		+= 60.0;
+		//
+		lFlee = _getFleeLocation( oCreature, oTarget, fDist + fDepthParam, fOptAngle + fDepthParam );
+
+	}
+	
+	return lFlee;
+}
 
 
 

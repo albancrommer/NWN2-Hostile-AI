@@ -29,7 +29,11 @@ void main () {
 	int nHasBoss = GetLocalInt( oController, CONTROLLER_TEAM_HAS_BOSS );
 	int nTeamHPCurrent = GetLocalInt( oController, CONTROLLER_TEAM_HP_CURRENT );
 	int nTeamHPTotal = GetLocalInt( oController, CONTROLLER_TEAM_HP_TOTAL );
+	
+	// Bug fix : nTeamHPTotal -must- not be null to be used as diviser
+	if( 0 == nTeamHPTotal ) nTeamHPTotal = 1;
 	int nPercentHPRemainingTeam = FloatToInt( 100.0 * IntToFloat(nTeamHPCurrent) / IntToFloat(nTeamHPTotal) ) ;
+	
 	int nMoraleCurrent = GetLocalInt( oController, CONTROLLER_TEAM_MORALE_CURRENT );
 	int nTeamState = GetLocalInt( oController, CONTROLLER_TEAM_STATE );
 	object oTeamTarget = GetLocalObject( oController, CONTROLLER_TEAM_TARGET_CURRENT );
